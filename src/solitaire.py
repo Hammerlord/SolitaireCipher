@@ -30,20 +30,20 @@ def decrypt(key: list, msg: str) -> str:
 def transform(cards: List[int], msg: str, combine: Callable) -> str:
     """
     Encrypts or decrypts the message, depending on the `combine` parametre.
-    :param cards: The ordering of the cards; this process doesn't mutate the original set.
+    :param cards: The ordering of the cards, or "key."
     :param msg: The message to encrypt or decrypt.
     :param combine: Function to combine (add/subtract) a letter number value with a keystream-generated value.
-    :return:
+    :return: The encrypted/decrypted result.
     """
     input = format_input(msg)
     cards = list(cards)
-    keystream_sequence = compose(count_cut,
-                                 triple_cut_by_jokers,
-                                 move_joker_b,
-                                 move_joker_a)
+    run_keystream_sequence = compose(count_cut,
+                                     triple_cut_by_jokers,
+                                     move_joker_b,
+                                     move_joker_a)
     output = []
     while len(output) < len(input):
-        cards = keystream_sequence(cards)
+        cards = run_keystream_sequence(cards)
         ks_val = get_keystream_value(cards)
         if is_joker(ks_val, cards):
             continue
@@ -104,8 +104,9 @@ def move_joker(joker: int, cards: List[int]) -> List[int]:
     """
     Moves a joker down the deck based on special rules:
     The smaller joker moves 1 card down, while the larger joker moves 2 cards down.
-    :return: Deck with the moved joker. This is a copy.
+    :return: New deck with the moved joker.
     """
+
     def wraparound(n: int) -> int:
         if n >= len(cards):
             # The wraparound value cannot be 0; it must always skip the first index
@@ -119,15 +120,13 @@ def move_joker(joker: int, cards: List[int]) -> List[int]:
     return cards
 
 
-def triple_cut(indices: tuple, cards: list) -> List[int]:
+def triple_cut(cut_indices: tuple, cards: list) -> List[int]:
     """
     Given two indices, perform a "triple cut," swapping cards above the top index with cards below the bottom index
     (retaining their respective order).
-    :param cards: The deck to cut.
-    :param indices: Indices to cut by.
-    :return: The cut deck. This is a copy.
+    :return: New deck that has been cut.
     """
-    lower, higher = sorted(indices)
+    lower, higher = sorted(cut_indices)
     return cards[higher + 1:] + cards[lower:higher + 1] + cards[:lower]
 
 
@@ -135,6 +134,7 @@ def count_cut(cards: List[int]) -> List[int]:
     """
     Perform a "count cut": Look at the value of the last card in the deck. Take that number of cards off
     the top of the deck and move them just above the bottom card (retaining their order).
+    :return: New deck that has been cut.
     """
     last = len(cards) - 1
     value = cards[last]
