@@ -45,7 +45,7 @@ def transform(cards: List[int], msg: str, combine: Callable) -> str:
     while len(output) < len(input):
         cards = keystream_sequence(cards)
         ks_val = get_keystream_value(cards)
-        if is_joker(cards, ks_val):
+        if is_joker(ks_val, cards):
             continue
         current_letter = input[len(output)]
         value = combine(LETTER_TO_NUM_MAP[current_letter], ks_val)
@@ -69,15 +69,15 @@ def generate_cards(suits=4) -> List[int]:
 def triple_cut_by_jokers(cards: List[int]) -> list:
     joker_a = len(cards) - 1
     joker_b = len(cards)
-    return triple_cut(cards, (cards.index(joker_a), cards.index(joker_b)))
+    return triple_cut((cards.index(joker_a), cards.index(joker_b)), cards)
 
 
 def move_joker_a(cards: List[int]) -> list:
-    return move_joker(cards, len(cards) - 1)
+    return move_joker(len(cards) - 1, cards)
 
 
 def move_joker_b(cards: List[int]) -> list:
-    return move_joker(cards, len(cards))
+    return move_joker(len(cards), cards)
 
 
 def get_keystream_value(cards: List[int]) -> int:
@@ -87,20 +87,20 @@ def get_keystream_value(cards: List[int]) -> int:
     return the value of the card at the resultant location.
     2) If the first card is a joker, return the value of the last card in the deck.
     """
-    index = cards[0] if not is_joker(cards, cards[0]) else len(cards) - 1
+    index = cards[0] if not is_joker(cards[0], cards) else len(cards) - 1
     return cards[index]
 
 
-def is_joker(cards: List[int], value: int) -> bool:
+def is_joker(value: int, cards: List[int]) -> bool:
     """
-    :param cards: The deck of cards, whose size is used to check for jokers.
     :param value: The card to check.
+    :param cards: The deck of cards, whose size is used to check for jokers.
     :return: True if value is a joker. Jokers are always the highest 2 values in a deck.
     """
     return value > len(cards) - 2
 
 
-def move_joker(cards: List[int], joker: int) -> List[int]:
+def move_joker(joker: int, cards: List[int]) -> List[int]:
     """
     Moves a joker down the deck based on special rules:
     The smaller joker moves 1 card down, while the larger joker moves 2 cards down.
@@ -119,7 +119,7 @@ def move_joker(cards: List[int], joker: int) -> List[int]:
     return cards
 
 
-def triple_cut(cards: list, indices: tuple) -> List[int]:
+def triple_cut(indices: tuple, cards: list) -> List[int]:
     """
     Given two indices, perform a "triple cut," swapping cards above the top index with cards below the bottom index
     (retaining their respective order).
@@ -138,7 +138,7 @@ def count_cut(cards: List[int]) -> List[int]:
     """
     last = len(cards) - 1
     value = cards[last]
-    if is_joker(cards, value):
+    if is_joker(value, cards):
         return list(cards)
     return cards[value:last] + cards[:value] + [cards[last]]
 

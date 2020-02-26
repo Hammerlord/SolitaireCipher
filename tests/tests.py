@@ -16,65 +16,65 @@ class SolitaireCipherTests(unittest.TestCase):
     def test_move_big_joker(self):
         #             |-| -> |
         items = [1, 2, 5, 3, 4]
-        result = move_joker(items, 5)
+        result = move_joker(5, items)
         self.assertListEqual(result, [1, 2, 3, 4, 5])
 
     def test_big_joker_wraparound_skips_first_index(self):
         #           | <- |-|
         items = [1, 2, 3, 5, 4]
-        result = move_joker(items, 5)
+        result = move_joker(5, items)
         self.assertListEqual(result, [1, 5, 2, 3, 4])
 
     def test_big_joker_last_to_third_index(self):
         #              | <- |-|
         items = [1, 2, 3, 4, 5]
-        result = move_joker(items, 5)
+        result = move_joker(5, items)
         self.assertListEqual(result, [1, 2, 5, 3, 4])
 
     def test_move_small_joker(self):
         #                |-|->|
         items = [1, 2, 3, 4, 5]
-        result = move_joker(items, 4)
+        result = move_joker(4, items)
         self.assertListEqual(result, [1, 2, 3, 5, 4])
 
     def test_small_joker_wraparound_skips_first_index(self):
         #           |   <-  |-|
         items = [1, 2, 3, 5, 4]
-        result = move_joker(items, 4)
+        result = move_joker(4, items)
         self.assertListEqual(result, [1, 4, 2, 3, 5])
 
     def test_triple_cut_indices_noninclusive(self):
         #        |1|   |---- 2 ----|    |- 3 -|   Expect 1 and 3 to be swapped, 2 remains same
         items = ['a', 'b', 'c', 'd', 'e', 'f']
         cut_indices = (items.index('b'), items.index('d'))
-        result = triple_cut(items, cut_indices)
+        result = triple_cut(cut_indices, items)
         self.assertListEqual(['e', 'f', 'b', 'c', 'd', 'a'], result)
 
     def test_triple_cut_indices_consecutive(self):
         #        |- 1 -|     |- 2 -|   |- 3 -|   Expect 1 and 3 to be swapped, 2 remains same
         items = ['a', 'b', 'c', 'd', 'e', 'f']
         cut_indices = (items.index('c'), items.index('d'))
-        result = triple_cut(items, cut_indices)
+        result = triple_cut(cut_indices, items)
         self.assertListEqual(['e', 'f', 'c', 'd', 'a', 'b'], result)
 
     def test_triple_cut_handles_unsorted_indices(self):
         items = ['a', 'b', 'c', 'd', 'e', 'f']
         cut_indices = (items.index('d'), items.index('b'))  # d > b
-        result = triple_cut(items, cut_indices)
+        result = triple_cut(cut_indices, items)
         self.assertListEqual(['e', 'f', 'b', 'c', 'd', 'a'], result)
 
     def test_triple_cut_start_end_indices(self):
         items = ['a', 'b', 'c', 'd', 'e', 'f']
         cut_indices = (items.index('a'), items.index('f'))
-        result = triple_cut(items, cut_indices)
+        result = triple_cut(cut_indices, items)
         self.assertListEqual(items, result)
 
     def test_is_joker(self):
         # The two highest values of a deck are the jokers.
         items = [1, 2, 3, 4, 5]
-        self.assertFalse(is_joker(items, 3))
-        self.assertTrue(is_joker(items, 4))
-        self.assertTrue(is_joker(items, 5))
+        self.assertFalse(is_joker(3, items))
+        self.assertTrue(is_joker(4, items))
+        self.assertTrue(is_joker(5, items))
 
     def test_count_cut_moves_cards_above_last(self):
         #        |- 1 -|    |2|    1 moves just before 2
