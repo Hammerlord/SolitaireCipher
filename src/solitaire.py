@@ -15,10 +15,7 @@ def encrypt(key: list, msg: str) -> str:
     :param msg: The plaintext message to encrypt.
     :return: The encrypted message.
     """
-    def combine(num: int, ks_val: int) -> int:
-        return num + ks_val
-
-    return transform(key, msg, combine)
+    return transform(key, msg, lambda n, k: n + k)
 
 
 def decrypt(key: list, msg: str) -> str:
@@ -27,10 +24,7 @@ def decrypt(key: list, msg: str) -> str:
     :param msg: The ciphertext to decrypt.
     :return: The decrypted message.
     """
-    def combine(num: int, ks_val: int) -> int:
-        return num - ks_val
-
-    return transform(key, msg, combine)
+    return transform(key, msg, lambda n, k: n - k)
 
 
 def transform(cards: List[int], msg: str, combine: Callable) -> str:
